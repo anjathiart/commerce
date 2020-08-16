@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Create new listing</h2>
+    <form>
+    	<input type="text" name="title"/>
+    	<input name="starting_bid">
+    	<textarea name="description"></textarea>
+    	<input type="tex" name="image_url">
+    	<input class="btn btn-primary" type="submit" value="Save and List">
+    </form>
+{% endblock %}
