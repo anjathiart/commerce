@@ -7,8 +7,8 @@ user_id | number of listings (int) | number of listings on watchlist (int) | num
 '''
 
 class User(AbstractUser):
+	# name = models.CharField(max_length=256)
 	pass
-	# name = models.CharField()
 	#listings = models.ManyToManyField(Listing, related_name="user_listings")
 	# watchlist = models.ManyToManyField(Listing, related_name="user_watchlist")
 

@@ -1,3 +1,57 @@
 body {
     padding: 10px;
 }
+
+
+p {
+	margin: 0px;
+	width: 100%;
+}
+
+input {
+	padding: 0px 10px;
+}
+
+textarea {
+	padding: 10px;
+}
+
+.flex-inline {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.form__create {
+	width: 50%;
+}
+
+.form__create input {
+	line-height: 2;
+}
+
+.form__create input, textarea {
+	width: 100%;
+}
+
+.form__create input[type=submit] {
+	width: 200px;
+	margin-top: 10px;
+}
+
+.form__create .form-group {
+	margin: 0px;
+	padding: 7px 10px;
+}
+
+.form__create .form-group:last-child {
+	/*text-align: center;*/
+}
+.form__create .form-group > p {
+	font-size: 0.9rem;
+	font-weight: 700;
+}
+
+.listingCard {
+	border: 1px solid red;
+}

@@ -81,7 +81,8 @@ def create_new(request):
         category = request.POST["category"]
 
         # save to db
-
+        listing = Listing(title=title, description=description, starting_bid=starting_bid, category=category, active=True, owner_id=request.user.id)
+        listing.save()
 
         # redirect
         return HttpResponseRedirect(reverse("index"))
