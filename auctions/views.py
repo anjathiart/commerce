@@ -5,12 +5,10 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Listing
+from .models import User, Listing, Bid
 
 
 def index(request):
-    print('hello')
-    print(Listing.objects.all())
     return render(request, "auctions/index.html", {
         "active_listings": Listing.objects.filter(active = True)
     })
@@ -89,5 +87,29 @@ def create_new(request):
 
     else:
         return render(request, "auctions/create_listing.html")
+
+def listing(request, listing_id):
+    return render(request, "auctions/listing.html", {
+        "listing": Listing.objects.filter(id = listing_id).get()
+    })
+
+@login_required(login_url='/login_view')
+def place_bid(request, listing_id):
+    if request.method == "POST":
+        value = request.POST["bid"]
+        # TODO: validate
+        bid = Bid(value=value, owner_id=request.user.id)
+        bid.save()
+        print('x')
+        listing = Listing.objects.get(id=listing_id);
+        listing.bids.add(bid)
+        listing.save();
+        # Listing.objects.filter(id=listing_id).update(bids=bid)
+        return HttpResponseRedirect(reverse("index"))
+    print('y')
+    return HttpResponseRedirect(reverse("index"))
+
+
+
 
 

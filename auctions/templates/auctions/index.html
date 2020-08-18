@@ -3,12 +3,14 @@
 {% block body %}
     <h2>Active Listings</h2>
     {% for listing in active_listings %}
-    <div class="listingCard">
-    	<img />
-    	<div>
-    		<h4>{{ listing.title }}</h4>
-    		<p>{{ listing.description }}</p>
-    	</div>
-    </div>
+    <form action="{% url 'listing' listing.id %}">
+        <div class="listingCard" onclick="javascript:this.parentNode.submit();">
+        	<img />
+        	<div>
+        		<h4>{{ listing.title }}</h4>
+        		<p>{{ listing.description }}</p>
+        	</div>
+        </div>
+    </form>
     {% endfor %}
 {% endblock %}

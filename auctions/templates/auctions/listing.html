@@ -1,15 +1,32 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>LISTING TITLE</h2>
-    <p>Add / remove from watchlist</p>
-    <img />
-	<p>Current bid</p>
-	<form>
-		<input name="bid" type="text" placeholder="Your bid value..." />
-		<input type="submit" value="Make bid!">
-	</form>
-    <p>Description...</p>
+    <div class="listing">
+        <p>{{ listing.title }}</p>
+        <p>user {{ user.id }}</p>
+        <p>owner {{ listing.owner_id }}</p>
+        <h2>{{ listing.title }}</h2>
+        <p>Add / remove from watchlist</p>
+        <img />
+    	<p>Current Price</p>
+        {% if user.id != listing.owner_id %}
+    	<form action="{% url 'place_bid' listing.id %}" method="post">
+            {% csrf_token %}
+    		<input name="bid" type="text" placeholder="Your bid value..." />
+    		<input type="submit" value="Make bid!">
+    	</form>
+        {% else %}
+        <form>
+           <!--  <input name="bid" type="text" placeholder="Your bid value..." /> -->
+            <input type="submit" value="Accept bid">
+        </form>
+        {% endif %}
+        <p>Description...</p>
+    </div>
+    <form>
+        <textarea name="comment" placeholder="Leave a comment..."></textarea>
+        <input type="submit" value="save">
+    <form>
     <div class="comments">Comments go here</div>
     TODO
 {% endblock %}

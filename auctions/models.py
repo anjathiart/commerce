@@ -24,6 +24,18 @@ class User(AbstractUser):
 	# status?
 	# pass
 
+
+'''
+Bids are linked to a particular listing and a particular user
+bid_id | date | amount (number / real) | user_id (fk) | listing_id (fk) | status
+TODO validators=[MinValueValidator(Decimal('0.01'))]
+'''
+class Bid(models.Model):
+	value = models.DecimalField(max_digits=6, decimal_places=2)
+	owner = models.ForeignKey(User, on_delete=models.CASCADE)
+	# listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+
+
 class Listing(models.Model):
 	title = models.CharField(max_length=256)
 	description = models.TextField()
@@ -31,6 +43,7 @@ class Listing(models.Model):
 	category = models.CharField(max_length=64)
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
 	active = models.BooleanField()
+	bids = models.ManyToManyField(Bid, blank=True, related_name="bids")
 	# bids = models.ManyToManyField(Bid, related_name="bids")
 	# comments = models.ManyToManyField(Comment, related_name="comments")
 	# pass
@@ -44,15 +57,7 @@ class Comment(models.Model):
 	listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
 	# pass
 
-'''
-Bids are linked to a particular listing and a particular user
-bid_id | date | amount (number / real) | user_id (fk) | listing_id (fk) | status
-TODO validators=[MinValueValidator(Decimal('0.01'))]
-'''
-class Bid(models.Model):
-	value = models.DecimalField(max_digits=6, decimal_places=2)
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+
 
 # first = models.CharField(max_length=64)
 #     last = models.CharField(max_length=64)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Listing
+from .models import Listing, Bid
 
 # Register your models here.
 
@@ -14,4 +14,5 @@ from .models import Listing
 
 # admin.site.register(Airport)
 admin.site.register(Listing)
+admin.site.register(Bid)
 # admin.site.register(Passenger, PassengerAdmin)
