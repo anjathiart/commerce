@@ -44,9 +44,9 @@ class Listing(models.Model):
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
 	active = models.BooleanField()
 	bids = models.ManyToManyField(Bid, blank=True, related_name="bids")
-	# bids = models.ManyToManyField(Bid, related_name="bids")
-	# comments = models.ManyToManyField(Comment, related_name="comments")
-	# pass
+	# TODO: can put the watchlist users here easily... It is silly to go through a Watchlist model because a specific listing 
+	# ... can only be on a specific user's watchlist once.
+
 
 '''
 A comment is made by a particular user and on a particular listing
@@ -57,7 +57,9 @@ class Comment(models.Model):
 	listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
 	# pass
 
-
+class Watchlist(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	listing =  models.ForeignKey(Listing, on_delete=models.CASCADE)
 
 # first = models.CharField(max_length=64)
 #     last = models.CharField(max_length=64)

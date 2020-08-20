@@ -1,7 +1,17 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Your watchlist</h2>
+    <h2>Your watchlist items</h2>
+    {% for listing in watchlist_listings %}
+    <form action="{% url 'listing' listing.id %}">
+        <div class="listingCard" onclick="javascript:this.parentNode.submit();">
+        	<img />
+        	<div>
+        		<h4>{{ listing.title }}</h4>
+        		<p>{{ listing.description }}</p>
 
-    TODO
+        	</div>
+        </div>
+    </form>
+    {% endfor %}
 {% endblock %}

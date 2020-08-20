@@ -6,7 +6,18 @@
         <p>user {{ user.id }}</p>
         <p>owner {{ listing.owner_id }}</p>
         <h2>{{ listing.title }}</h2>
-        <p>Add / remove from watchlist</p>
+
+        <form action="{% url 'watchlist' %}" method="POST">
+            {% csrf_token %}
+            <input name="listing_id" value="{{ listing.id }}" hidden>
+            {% if watchlist %}
+            <input name="toggle" value="remove" hidden>
+            <input type="submit" value="Remove from watchlist">
+            {% else %}
+            <input name="toggle" value="add" hidden>
+            <input type="submit" value="Add to watchlist">
+            {% endif %}
+        </form>
         <img />
     	<p>Current Price</p>
         {% if user.id != listing.owner_id %}
