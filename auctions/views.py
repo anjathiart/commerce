@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Count, Q
-from .models import User, Listing, Bid, Watchlist
+from .models import User, Listing, Bid
 
 
 def index(request):
@@ -79,7 +79,7 @@ def create_new(request):
         category = request.POST["category"]
 
         # save to db
-        listing = Listing(title=title, description=description, starting_bid=starting_bid, category=category, active=True, owner_id=request.user.id)
+        listing = Listing(title=title, description=description, starting_bid=starting_bid, category=category, active=True, owner=request.user)
         listing.save()
 
         # redirect
@@ -91,18 +91,17 @@ def create_new(request):
 
 def listing(request, listing_id):
     page_data = {}
-    listing = Listing.objects.filter(id = listing_id)\
-    .annotate(max_bid=Max('bids__value'), num_bids=Count('bids'))\
-    .get();
 
-    
+    listing = Listing.objects.filter(id=listing_id)\
+    .annotate(max_bid=Max('bids__value'), num_bids=Count('bids'))\
+    .get(); 
 
     watchlist = False
-    if Watchlist.objects.filter(listing = listing).filter(user = request.user):
+    if Listing.objects.filter(users__id=request.user.id):
         watchlist = True
 
-    if listing.owner_id == request.user.id:
-        print('yes')
+    if listing.owner == request.user:
+        print('owner')
     else:
         # check if user has this liting on their wishlist
         # wishlist_users = Listing.objects.values_list('wishlist_users', flat=True).filter(id = listing_id).get()
@@ -117,36 +116,35 @@ def listing(request, listing_id):
 
 @login_required(login_url='/login_view')
 def place_bid(request, listing_id):
+    print('bid)')
     if request.method == "POST":
         value = request.POST["bid"]
         # TODO: validate
-        bid = Bid(value=value, owner_id=request.user.id)
+        bid = Bid(value=value, owner=request.user)
         bid.save()
         listing = Listing.objects.get(id=listing_id);
         listing.bids.add(bid)
         listing.save();
-        # Listing.objects.filter(id=listing_id).update(bids=bid)
         return HttpResponseRedirect(reverse("index"))
     return HttpResponseRedirect(reverse("index"))
 
 
 @login_required(login_url='/login_view')
 def watchlist(request):
+    print('watchlist')
     if request.method == "POST":
         listing_id = request.POST['listing_id']
         action = request.POST['toggle']
         listing = Listing.objects.get(id=listing_id)
         if action == "add":
-            watchlist = Watchlist(user=request.user, listing=listing)
-            watchlist.save()
+            listing.users.add(request.user)
+            listing.save()
         if action == "remove":
-            Watchlist.objects.filter(user=request.user, listing=listing).delete()
+            listing.users.remove(request.user)
+            listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     else:
-        # TODO -> handle error if the query fails.
-        # TODO -> change implemnation to keep track of watchlist users in the listings model
-        # ... because below you are just extracting all the watclist_id's that are associated with that user
-        watchlist_listings = Watchlist.objects.filter(user=request.user)
+        watchlist_listings = Listing.objects.filter(users__id=request.user.id)
         return render(request, "auctions/watchlist.html", {
             "watchlist_listings": watchlist_listings
         })
