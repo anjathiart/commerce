@@ -2,42 +2,57 @@
 
 {% block body %}
     <div class="listing">
-        <p>{{ listing.title }}</p>
-        <p>user {{ user.id }}</p>
-        <p>owner {{ listing.owner_id }}</p>
         <h2>{{ listing.title }}</h2>
-
-        <form action="{% url 'watchlist' %}" method="POST">
-            {% csrf_token %}
-            <input name="listing_id" value="{{ listing.id }}" hidden>
+        {% if user.is_authenticated and user.id != listing.owner.id %}
             {% if watchlist %}
-            <input name="toggle" value="remove" hidden>
-            <input type="submit" value="Remove from watchlist">
+            <form action="{% url 'watchlist' %}" method="POST">
+                {% csrf_token %}
+                <input name="listing_id" value="{{ listing.id }}" hidden>
+                <input name="toggle" value="remove" hidden>
+                <input type="submit" value="Remove from watchlist"> 
+            </form>
             {% else %}
-            <input name="toggle" value="add" hidden>
-            <input type="submit" value="Add to watchlist">
+            <form action="{% url 'watchlist' %}" method="POST">
+                {% csrf_token %}
+                <input name="listing_id" value="{{ listing.id }}" hidden>
+                <input name="toggle" value="add" hidden>
+                <input type="submit" value="Add from watchlist"> 
+            </form>
             {% endif %}
-        </form>
+        {% endif %}
         <img />
-    	<p>Current Price</p>
-        {% if user.id != listing.owner_id %}
+
+        {% if listing.bids.count == 0  %}
+    	   <p>Starting bid: R {{ listing.starting_bid }}</p>
+        {% else %}
+            <p>Current bid: R {{ listing.max_bid.value }}</p>
+        {% endif %}
+
+        {% if user.id != listing.owner.id %}
     	<form action="{% url 'place_bid' listing.id %}" method="post">
             {% csrf_token %}
-    		<input name="bid" type="text" placeholder="Your bid value..." />
+    		<input name="bid" type="number" min="{{ listing.min_bid }}"  placeholder="Your bid value..." />
     		<input type="submit" value="Make bid!">
     	</form>
-        {% else %}
-        <form>
-           <!--  <input name="bid" type="text" placeholder="Your bid value..." /> -->
+        {% elif listing.num_bids > 0 and listing.active %}
+        <form action="{% url 'accept_bid' listing.id %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="bid_id" value="{{ listing.max_bid.id }}" hidden>
             <input type="submit" value="Accept bid">
         </form>
         {% endif %}
-        <p>Description...</p>
+        <p>{{ listing.description }}</p>
     </div>
-    <form>
-        <textarea name="comment" placeholder="Leave a comment..."></textarea>
-        <input type="submit" value="save">
-    <form>
-    <div class="comments">Comments go here</div>
+    {% if user.is_authenticated %}
+    <form action="{% url 'comment' listing.id %}" method="POST">
+         {% csrf_token %}
+          <textarea name="comment" class="comment" placholder="Leave a comment"></textarea>
+          <input type="submit" value="save">
+    </form>
+    {% endif %}
+    {% for comment in comments %}
+        <p>{{ comment.text }}</p>
+    {% endfor %}
+    
     TODO
 {% endblock %}

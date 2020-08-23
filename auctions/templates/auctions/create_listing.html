@@ -10,7 +10,11 @@
     	</div>
     	<div class="form-group">
 	    	<p>Category:</p>
-	    	<input type="text" name="category" placeholder="eg. Electronics">
+	    	<select name="category">
+	    		{% for category in categories %}
+	    		<option value="{{ category.id }}">{{ category.value }}</option>
+	    		{% endfor %}
+	    	</select>
 	    </div>
 	    <div class="form-group">
 	    	<p>Starting Bid:</p>

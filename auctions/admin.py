@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Listing, Bid
+from .models import Listing, Bid, Category, Comment
 
 # Register your models here.
 
@@ -12,8 +12,7 @@ from .models import Listing, Bid
 #     filter_horizontal = ("flights",)
     
 
-# admin.site.register(Airport)
 admin.site.register(Listing)
 admin.site.register(Bid)
-# admin.site.register(Watchlist)
-# admin.site.register(Passenger, PassengerAdmin)
+admin.site.register(Comment)
+admin.site.register(Category)

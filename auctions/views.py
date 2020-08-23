@@ -5,14 +5,27 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Count, Q
-from .models import User, Listing, Bid
+from .models import User, Listing, Bid, Comment, Category
 
 
 def index(request):
+    categories = Category.objects.all().order_by('value')
     return render(request, "auctions/index.html", {
-        "active_listings": Listing.objects.filter(active = True)
+        "active_listings": Listing.objects.filter(active = True),
+        "categories": categories
     })
 
+def filter(request, category_id):
+    categories = Category.objects.all()
+    category = Category.objects.get(id=category_id)
+    active_category = category.value
+    listings = category.listings
+
+    return render(request, "auctions/index.html", {
+        "active_listings": listings,
+        "categories": categories,
+        "active_category": active_category
+    })
 
 
 def login_view(request):
@@ -76,47 +89,50 @@ def create_new(request):
         description = request.POST["description"]
         starting_bid = request.POST["starting_bid"]
         image_url = request.POST["image_url"]
-        category = request.POST["category"]
+        category_id = request.POST["category"]
 
         # save to db
-        listing = Listing(title=title, description=description, starting_bid=starting_bid, category=category, active=True, owner=request.user)
+        listing = Listing(title=title, description=description, starting_bid=starting_bid, active=True, owner=request.user)
         listing.save()
+
+        category = Category.objects.get(id=category_id)
+        category.listings.add(listing)
+        category.save()
 
         # redirect
         return HttpResponseRedirect(reverse("index"))
 
     else:
-        return render(request, "auctions/create_listing.html")
+        categories = Category.objects.all().order_by('value')
+        return render(request, "auctions/create_listing.html", {
+            "categories": categories
+        })
 
 
 def listing(request, listing_id):
-    page_data = {}
+    listing = Listing.objects.filter(id=listing_id).get();
+    listing.num_bids = listing.bids.count()
 
-    listing = Listing.objects.filter(id=listing_id)\
-    .annotate(max_bid=Max('bids__value'), num_bids=Count('bids'))\
-    .get(); 
+    comments = []
+    if listing.num_bids > 0:
+        listing.min_bid = listing.max_bid.value + 1
+        listing.max_bid = listing.bids.order_by('value')[0]
+    if listing.comments.count() > 0:
+        comments = listing.comments.all()
 
+    # can probably do this via an annotation?
     watchlist = False
-    if Listing.objects.filter(users__id=request.user.id):
+    if Listing.objects.filter(id=listing_id).filter(users__id=request.user.id):
         watchlist = True
 
-    if listing.owner == request.user:
-        print('owner')
-    else:
-        # check if user has this liting on their wishlist
-        # wishlist_users = Listing.objects.values_list('wishlist_users', flat=True).filter(id = listing_id).get()
-        print('no')
-            # print('user has listing in wishlist')
-
-
     return render(request, "auctions/listing.html", {
-        "listing": Listing.objects.filter(id = listing_id).get(),
-        "watchlist": watchlist
+        "listing": listing,
+        "watchlist": watchlist,
+        "comments": comments,
     })
 
 @login_required(login_url='/login_view')
 def place_bid(request, listing_id):
-    print('bid)')
     if request.method == "POST":
         value = request.POST["bid"]
         # TODO: validate
@@ -124,30 +140,49 @@ def place_bid(request, listing_id):
         bid.save()
         listing = Listing.objects.get(id=listing_id);
         listing.bids.add(bid)
-        listing.save();
+        listing.save()
         return HttpResponseRedirect(reverse("index"))
     return HttpResponseRedirect(reverse("index"))
 
+@login_required(login_url='/login_view')
+def accept_bid(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(id=listing_id)
+        bid_id = request.POST['bid_id']
+        listing.winner = Bid.objects.get(id=bid_id).owner
+        listing.active = False
+        listing.save()
+        return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("index"))
 
 @login_required(login_url='/login_view')
 def watchlist(request):
-    print('watchlist')
     if request.method == "POST":
         listing_id = request.POST['listing_id']
         action = request.POST['toggle']
         listing = Listing.objects.get(id=listing_id)
         if action == "add":
             listing.users.add(request.user)
-            listing.save()
         if action == "remove":
             listing.users.remove(request.user)
-            listing.save()
+        listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     else:
-        watchlist_listings = Listing.objects.filter(users__id=request.user.id)
+        watchlist_listings = Listing.objects.filter(users__id=request.user.id).all()
         return render(request, "auctions/watchlist.html", {
             "watchlist_listings": watchlist_listings
         })
 
+
+@login_required(login_url='/login_view')
+def comment(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(id=listing_id)
+        comment = Comment(user=request.user,  text=request.POST['comment'])
+        comment.save()
+        listing.comments.add(comment)
+        listing.save()
+        return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
+    return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
 
 
