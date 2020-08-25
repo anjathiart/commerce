@@ -3,6 +3,7 @@
 {% block body %}
     <div class="listing">
         <h2>{{ listing.title }}</h2>
+        <p>{{listing.category}}
         {% if user.is_authenticated and user.id != listing.owner.id %}
             {% if watchlist %}
             <form action="{% url 'watchlist' %}" method="POST">
@@ -50,7 +51,7 @@
           <input type="submit" value="save">
     </form>
     {% endif %}
-    {% for comment in comments %}
+    {% for comment in listing.comments %}
         <p>{{ comment.text }}</p>
     {% endfor %}
     
