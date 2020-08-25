@@ -9,22 +9,19 @@ from .models import User, Listing, Bid, Comment, Category
 
 
 def index(request):
-    categories = Category.objects.all().order_by('value')
-    return render(request, "auctions/index.html", {
-        "active_listings": Listing.objects.filter(active = True),
-        "categories": categories
-    })
+    category_id = request.GET.get('category_id', '')
+    if category_id:
+        category = Category.objects.get(id=category_id)
+        listings = category.listing_category.all()
+        listings.category = category.value
+    else:
+        listings = Listing.objects.all()
 
-def filter(request, category_id):
-    categories = Category.objects.all()
-    category = Category.objects.get(id=category_id)
-    active_category = category.value
-    listings = category.listings
+    categories = Category.objects.all().order_by('value')
 
     return render(request, "auctions/index.html", {
         "active_listings": listings,
-        "categories": categories,
-        "active_category": active_category
+        "categories": categories
     })
 
 
@@ -90,14 +87,10 @@ def create_new(request):
         starting_bid = request.POST["starting_bid"]
         image_url = request.POST["image_url"]
         category_id = request.POST["category"]
-
-        # save to db
-        listing = Listing(title=title, description=description, starting_bid=starting_bid, active=True, owner=request.user)
-        listing.save()
-
         category = Category.objects.get(id=category_id)
-        category.listings.add(listing)
-        category.save()
+        # save to db
+        listing = Listing(title=title, description=description, category=category, starting_bid=starting_bid, active=True, owner=request.user)
+        listing.save()
 
         # redirect
         return HttpResponseRedirect(reverse("index"))
@@ -109,27 +102,31 @@ def create_new(request):
         })
 
 
-def listing(request, listing_id):
-    listing = Listing.objects.filter(id=listing_id).get();
-    listing.num_bids = listing.bids.count()
+def listing(request, listing_id=''):
+    if request.method == "POST":
+        pass
+    else:
+        listing = Listing.objects.get(id=listing_id);
+        bids = Bid.objects.filter(listing__id=listing_id).order_by('value').all()
 
-    comments = []
-    if listing.num_bids > 0:
-        listing.min_bid = listing.max_bid.value + 1
-        listing.max_bid = listing.bids.order_by('value')[0]
-    if listing.comments.count() > 0:
-        comments = listing.comments.all()
+        if bids.count() > 0:
+            listing.bid = bids[0]
+        else:
+            listing.bid = False
 
-    # can probably do this via an annotation?
-    watchlist = False
-    if Listing.objects.filter(id=listing_id).filter(users__id=request.user.id):
-        watchlist = True
+        comments = Comment.objects.filter(listing__id=listing_id).all()
+        listing.comments = comments
 
-    return render(request, "auctions/listing.html", {
-        "listing": listing,
-        "watchlist": watchlist,
-        "comments": comments,
-    })
+        # can probably do this via an annotation?
+        watchlist = False
+        if Listing.objects.filter(id=listing_id).filter(users__id=request.user.id):
+            watchlist = True
+
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "watchlist": watchlist,
+        })
+
 
 @login_required(login_url='/login_view')
 def place_bid(request, listing_id):
@@ -178,10 +175,10 @@ def watchlist(request):
 def comment(request, listing_id):
     if request.method == "POST":
         listing = Listing.objects.get(id=listing_id)
-        comment = Comment(user=request.user,  text=request.POST['comment'])
+        comment = Comment(user=request.user, listing=listing, text=request.POST['comment'])
         comment.save()
-        listing.comments.add(comment)
-        listing.save()
+        # listing.comments.add(comment)
+        # listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
 
