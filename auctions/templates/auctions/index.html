@@ -1,16 +1,16 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <!-- <h2>Active Listings</h2> -->
     <section class="view view__listings debug-2">
         <nav class="categoryLinks debug">
-            <ul>
+            <ul class="nav sideNav">
                 {% for category in categories %}
                 <li><a href="{% url 'index' %}?category_id={{ category.id }}" >{{ category.value }}</a></li>
                 {% endfor %}
             </ul>
         </nav>
-        <div class=" listings__containter">
+        <div class=" view__main">
             {% for listing in active_listings %}
             <form action="{% url 'listing' listing.id %}">
                 <div class="listings__card" onclick="javascript:this.parentNode.submit();">
@@ -19,7 +19,8 @@
                     {% else %}
                     <p class="img__placeholder"></p>
                     {% endif %}
-                    <h5>{{ listing.title }}</h5>
+                    <h6>{{ listing.title }}</h5>
+                    <p class="pricetag">R 500</p>
             		<p class="p--tiny description">{{ listing.description }}</p>
                 </div>
             </form>
