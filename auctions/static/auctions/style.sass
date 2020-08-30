@@ -5,7 +5,6 @@ $primary20: #D0E6FD
 $primary: #429BF5
 $primary90: #142F4A
 
-
 %flex-inline-between
 	display: flex
 	justify-content: space-between
@@ -23,7 +22,6 @@ body
 
 p 
 	margin: 0px
-	// width: 100%
 
 .p--tiny
 	font-size: 12px
@@ -44,7 +42,6 @@ textarea
 	background-color: white
 	border-bottom: 1px solid grey
 	&__left
-		// border: 1px solid red
 		display: flex
 		justify-content: flex-start
 		align-items: center
@@ -76,18 +73,26 @@ textarea
 	margin-left: auto
 	margin-right: auto
 
+.view__user
+	width: 420px
+	padding-top: 3rem
+	input[type=text], input[type=password], input[type=email]
+		background-color: white !important
+	input[type=submit]
+		margin-bottom: 1rem
+
 .listing
 	display: flex
 	flex-direction: column
 	align-items: space-around
 	justify-content: space-around
-	
+	width: 1024px
 	&__head
 		padding: 1rem
 		background-color: white
 		border: 1px solid lightgrey
 		display: flex
-		justify-content: flex-start
+		justify-content: stretch
 		align-items: stretch
 		&--img
 			border: 1px solid lightgrey
@@ -101,8 +106,6 @@ textarea
 			margin-top: 0rem
 			display: flex
 			flex-direction: column
-			justify-content: flex-start
-			align-items: flex-start
 			> div:last-child
 				border-top: 1px solid lightgrey
 				padding-top: 0.5rem
@@ -115,10 +118,8 @@ textarea
 	justify-content: space-between
 	margin-top: 1rem
 	max-height: 80vh
-	// > *
-	// 	border: 1px solid green
 	&__new
-		width: 440px
+		width: 440px !important
 		height: 100px
 		> form
 			display: flex
@@ -127,17 +128,15 @@ textarea
 			textarea
 				border: 1px solid lightgrey
 				margin-bottom: 0.6rem
+				width: 100%
 				
 	&__old
 		width: 540px
 		overflow-y: scroll
 		padding-right: 1rem
 		.comment
-			// background-color: white
-			// border-radius: 10px
 			border-bottom: 1px solid lightgrey
 			margin: 0.5rem
-
 			padding: 8px 16px
 			font-size: 14px
 			padding-bottom: 1rem
@@ -175,13 +174,8 @@ textarea
 		border-radius: 6px
 		padding: 1rem
 		cursor: pointer
-		// border: 1px solid grey
 		transform: scale(1)
 		transition: all 0.1s
-		// h5
-		// 	margin-top: 2px
-		// 	margin-bottom: 0px
-		// 	padding-bottom: 0px
 		&:hover
 			transform: scale(1.025)
 		.img
@@ -199,8 +193,6 @@ textarea
 			min-width: 50px
 			background-color: rgba($primary, 0.1)
 		.pricetag
-			// min-width: 2rem
-			// max-width: 5rem
 			width: auto
 			margin-bottom: 10px
 			display: inline-block
@@ -211,39 +203,19 @@ textarea
 			padding: 2px 8px
 			font-size: 0.85rem
 
-.new
-	// border: 1px solid red
+.view__new
+	width: 800px
 	input[type=text], select
 		width: 420px
 		padding: 5px 10px
 	input[type=number]
 		padding: 5px 10px
 	textarea
-		width: 80%
+		width: 100%
 		height: 10rem
-
-.flex-inline 
-	display: flex 
-	justify-content: flex-start 
-	align-items: center
-
-.form__create 
-	width: 50% 
-	input 
-		line-height: 2 
-	input[type=submit] 
-		width: 200px 
-		margin-top: 10px 
-	.form-group 
-		margin: 0px 
-		padding: 7px 10px 
-		& > p 
-			font-size: 0.9rem 
-			font-weight: 700
-
-
-.form__create input, textarea 
-	width: 100% 
-
+	#imgUrl
+		width: 100%
+	input[type=submit]
+		margin-top: 0.5rem
 
 

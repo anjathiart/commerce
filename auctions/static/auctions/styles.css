@@ -74,18 +74,30 @@ textarea {
   margin-right: auto;
 }
 
+.view__user {
+  width: 420px;
+  padding-top: 3rem;
+}
+.view__user input[type=text], .view__user input[type=password], .view__user input[type=email] {
+  background-color: white !important;
+}
+.view__user input[type=submit] {
+  margin-bottom: 1rem;
+}
+
 .listing {
   display: flex;
   flex-direction: column;
   align-items: space-around;
   justify-content: space-around;
+  width: 1024px;
 }
 .listing__head {
   padding: 1rem;
   background-color: white;
   border: 1px solid lightgrey;
   display: flex;
-  justify-content: flex-start;
+  justify-content: stretch;
   align-items: stretch;
 }
 .listing__head--img {
@@ -101,8 +113,6 @@ textarea {
   margin-top: 0rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
 }
 .listing__head--details > div:last-child {
   border-top: 1px solid lightgrey;
@@ -119,7 +129,7 @@ textarea {
   max-height: 80vh;
 }
 .comments__new {
-  width: 440px;
+  width: 440px !important;
   height: 100px;
 }
 .comments__new > form {
@@ -130,6 +140,7 @@ textarea {
 .comments__new > form textarea {
   border: 1px solid lightgrey;
   margin-bottom: 0.6rem;
+  width: 100%;
 }
 .comments__old {
   width: 540px;
@@ -215,45 +226,25 @@ textarea {
   font-size: 0.85rem;
 }
 
-.new input[type=text], .new select {
+.view__new {
+  width: 800px;
+}
+.view__new input[type=text], .view__new select {
   width: 420px;
   padding: 5px 10px;
 }
-.new input[type=number] {
+.view__new input[type=number] {
   padding: 5px 10px;
 }
-.new textarea {
-  width: 80%;
+.view__new textarea {
+  width: 100%;
   height: 10rem;
 }
-
-.flex-inline {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.form__create {
-  width: 50%;
-}
-.form__create input {
-  line-height: 2;
-}
-.form__create input[type=submit] {
-  width: 200px;
-  margin-top: 10px;
-}
-.form__create .form-group {
-  margin: 0px;
-  padding: 7px 10px;
-}
-.form__create .form-group > p {
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.form__create input, textarea {
+.view__new #imgUrl {
   width: 100%;
+}
+.view__new input[type=submit] {
+  margin-top: 0.5rem;
 }
 
 /*# sourceMappingURL=styles.css.map */
