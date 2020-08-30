@@ -2,7 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
-	pass
+	def __str__(self):
+		return self.username
 
 '''
 A category has a value and can have many listings associated with it
@@ -17,15 +18,11 @@ A listing cas have many bids and comments  associated with it. A listing can bel
 class Listing(models.Model):
 	title = models.CharField(max_length=256)
 	description = models.TextField(blank=True)
-	starting_bid =  models.DecimalField(max_digits=6, decimal_places=2)
+	starting_bid =  models.DecimalField(max_digits=10, decimal_places=2)
 	owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner")
 	active = models.BooleanField(default=True)
 	winner = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name="winner")
 	image_url = models.CharField(max_length=1024, null=True)
-	# bids = models.ManyToManyField(Bid, blank=True, related_name="bids")
-	# comments = models.ManyToManyField(Comment, blank=True, related_name="comments")
-	# TODO: can put the watchlist users here easily... It is silly to go through a Watchlist model because a specific listing 
-	# ... can only be on a specific user's watchlist once.
 	users = models.ManyToManyField(User, blank=True, related_name="watchlist_users")
 	category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE, related_name="listing_category")
 
@@ -36,8 +33,8 @@ TODO validators=[MinValueValidator(Decimal('0.01'))]
 '''
 class Bid(models.Model):
 	value = models.DecimalField(max_digits=6, decimal_places=2)
-	owner = models.ForeignKey(User, on_delete=models.CASCADE)
-	listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+	owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bid_owner")
+	listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='listing')
 
 '''
 A comment is made by a particular user and on a particular listing
@@ -47,4 +44,5 @@ class Comment(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	text = models.TextField(blank=True)
 	listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now_add=True, null=True)
 

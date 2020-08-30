@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Max, Count, Q
+from django.db.models import Max, Count, Q, F
 from .models import User, Listing, Bid, Comment, Category
 
 
@@ -12,10 +12,12 @@ def index(request):
     category_id = request.GET.get('category_id', '')
     if category_id:
         category = Category.objects.get(id=category_id)
-        listings = category.listing_category.all()
-        listings.category = category.value
+        listings = category.listing_category.annotate(bid=Max("listing__value")).all()
+        listings.category = category
     else:
-        listings = Listing.objects.all()
+        listings = Listing.objects.annotate(bid=Max("listing__value")).all()
+        listing.category = None
+
 
     categories = Category.objects.all().order_by('value')
 
@@ -106,16 +108,8 @@ def listing(request, listing_id=''):
     if request.method == "POST":
         pass
     else:
-        listing = Listing.objects.get(id=listing_id);
-        bids = Bid.objects.filter(listing__id=listing_id).order_by('value').all()
-
-        if bids.count() > 0:
-            listing.bid = bids[0]
-        else:
-            listing.bid = False
-
-        comments = Comment.objects.filter(listing__id=listing_id).all()
-        listing.comments = comments
+        listing = Listing.objects.annotate(bid=Max("listing__value")).get(id=listing_id);
+        listing.comments = Comment.objects.filter(listing__id=listing_id).order_by('-created_at').all()
 
         # can probably do this via an annotation?
         watchlist = False
@@ -132,12 +126,11 @@ def listing(request, listing_id=''):
 def place_bid(request, listing_id):
     if request.method == "POST":
         value = request.POST["bid"]
+        print(value)
         # TODO: validate
-        bid = Bid(value=value, owner=request.user)
-        bid.save()
         listing = Listing.objects.get(id=listing_id);
-        listing.bids.add(bid)
-        listing.save()
+        bid = Bid(value=value, owner=request.user, listing=listing)
+        bid.save()
         return HttpResponseRedirect(reverse("index"))
     return HttpResponseRedirect(reverse("index"))
 

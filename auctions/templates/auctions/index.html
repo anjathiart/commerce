@@ -20,7 +20,11 @@
                     <p class="img__placeholder"></p>
                     {% endif %}
                     <h6>{{ listing.title }}</h5>
-                    <p class="pricetag">R 500</p>
+                    {% if listing.bid %}
+                    <p class="pricetag">{{ listing.bid }}</p>
+                    {% else %}
+                    <p class="pricetag">{{ listing.starting_bid }}</p>
+                    {% endif %}
             		<p class="p--tiny description">{{ listing.description }}</p>
                 </div>
             </form>

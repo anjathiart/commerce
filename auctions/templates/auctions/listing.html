@@ -6,11 +6,11 @@
                 <img src="{{ listing.image_url }}" class="listing__head--img"/>
                 <div class="listing__head--details">
                     <h2>{{ listing.title }}</h2>
-                    <p>{{listing.category}}</p>
-                    {% if listing.bids.count == 0  %}
-                       <p>Starting bid: R {{ listing.starting_bid }}</p>
+                    <p>{{listing.category.value}}</p>
+                    {% if listing.bid %}
+                       <p>Current bid: R {{ listing.bid }}</p>
                     {% else %}
-                        <p>Current bid: R {{ listing.max_bid.value }}</p>
+                        <p>Starting bid: R {{ listing.starting_bid }}</p>
                     {% endif %}
                     {% if user.is_authenticated and user.id != listing.owner.id %}
                         {% if watchlist %}
@@ -32,7 +32,11 @@
                     {% if user.id != listing.owner.id %}
                         <form action="{% url 'place_bid' listing.id %}" method="post">
                             {% csrf_token %}
-                            <input name="bid" type="number" min="{{ listing.min_bid }}"  placeholder="Your bid value..." />
+                            {% if listing.bid %}
+                            <input name="bid" type="number" min="{{ listing.bid | add:'1' }}"  placeholder="Minimum bid is R {{ listing.bid | add:'1' }}" />
+                            {% else %}
+                            <input name="bid" type="number" min="{{ listing.starting_bid }}"  placeholder="Minimum bid is R {{ listing.starting_bid }}" />
+                            {% endif %}
                             <input type="submit" value="Make bid!">
                         </form>
                     {% elif listing.num_bids > 0 and listing.active %}
@@ -58,7 +62,7 @@
                 <div class="comments__old">
                     {% for comment in listing.comments %}
                         <div class="comment">
-                            <p class="comment__info"><span>Anja</span><span>December 2, 2020</span></p>
+                            <p class="comment__info"><span>{{ comment.user }}</span><span>{{ comment.created_at}}<span></p>
                             <p>{{ comment.text }}</p>
                         </div>
                     {% endfor %}
