@@ -1,17 +1,23 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Your watchlist items</h2>
-    {% for listing in watchlist_listings %}
-    <form action="{% url 'listing' listing.id %}">
-        <div class="listingCard" onclick="javascript:this.parentNode.submit();">
-        	<img />
-        	<div>
-        		<h4>{{ listing.title }}</h4>
-        		<p>{{ listing.description }}</p>
-
-        	</div>
+    <section class="view view__main">
+        <h2>Your watchlist items</h2>
+        <div class="listings">
+            {% for listing in watchlist_listings %}
+            <form action="{% url 'listing' listing.id %}">
+                <div class="listings__card" onclick="javascript:this.parentNode.submit();">
+                	{% if listing.image_url %}
+                    <p class="img"><img src="{{ listing.image_url }}"/></p>
+                    {% else %}
+                    <p class="img__placeholder"></p>
+                    {% endif %}
+                	<h6>{{ listing.title }}</h6>
+                    <p class="pricetag">R 500</p>
+                    <p class="p--tiny description">{{ listing.description }}</p>
+                </div>
+            </form>
+            {% endfor %}
         </div>
-    </form>
-    {% endfor %}
+    </section>
 {% endblock %}

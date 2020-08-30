@@ -1,8 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <div class="view view__main">
-        <div class="listing">
+        <div class="view__main listing">
             <section class="listing__head">
                 <img src="{{ listing.image_url }}" class="listing__head--img"/>
                 <div class="listing__head--details">
@@ -43,24 +42,27 @@
                             <input type="submit" value="Accept bid">
                         </form>
                     {% endif %}
-                    <p>{{ listing.description }}</p>
+                    <div>{{ listing.description }}</div>
                 </div>
             </section>
-                {% if user.is_authenticated %}
-                    <form action="{% url 'comment' listing.id %}" method="POST" class="listing__commentForm">
-                        {% csrf_token %}
-                        <textarea name="comment" placeholder="Leave a comment..."></textarea>
-                        <input type="submit" value="save" >
-                    </form>
-                {% endif %}
             <section class="comments">
-                {% for comment in listing.comments %}
-                    <div class="comment">
-                        <p class="comment__info"><span>Anja</span><span>December 2, 2020</span></p>
-                        <p>{{ comment.text }}</p>
-                    </div>
-                {% endfor %}
+                <div class="comments__new">
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'comment' listing.id %}" method="POST">
+                            {% csrf_token %}
+                            <textarea name="comment" placeholder="Leave a comment..."></textarea>
+                            <input type="submit" value="save" >
+                        </form>
+                    {% endif %}
+                </div>
+                <div class="comments__old">
+                    {% for comment in listing.comments %}
+                        <div class="comment">
+                            <p class="comment__info"><span>Anja</span><span>December 2, 2020</span></p>
+                            <p>{{ comment.text }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
             </section>
          </div>
-    </div>
 {% endblock %}

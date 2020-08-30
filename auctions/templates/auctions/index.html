@@ -2,7 +2,7 @@
 
 {% block body %}
     <!-- <h2>Active Listings</h2> -->
-    <section class="view view__listings debug-2">
+    <section class="view view__listings">
         <nav class="categoryLinks debug">
             <ul class="nav sideNav">
                 {% for category in categories %}
@@ -10,7 +10,7 @@
                 {% endfor %}
             </ul>
         </nav>
-        <div class=" view__main">
+        <div class="listings">
             {% for listing in active_listings %}
             <form action="{% url 'listing' listing.id %}">
                 <div class="listings__card" onclick="javascript:this.parentNode.submit();">
