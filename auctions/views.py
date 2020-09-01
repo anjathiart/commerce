@@ -17,13 +17,17 @@ def index(request):
     else:
         listings = Listing.objects.annotate(bid=Max("listing__value")).all()
         listing.category = None
-
-
+    status = {}
+    status['code'] = request.GET.get('code', '')
+    status['msg'] = request.GET.get('msg', '')
+    print(status)
+    # print(request.GET.get('msg', ''))
     categories = Category.objects.all().order_by('value')
 
     return render(request, "auctions/index.html", {
         "active_listings": listings,
-        "categories": categories
+        "categories": categories,
+        "status": status
     })
 
 
@@ -108,30 +112,54 @@ def listing(request, listing_id=''):
     if request.method == "POST":
         pass
     else:
+        status = {}
+        status['code'] = request.GET.get('code', '')
+        status['msg'] = request.GET.get('msg', '')
+        print(status)
         listing = Listing.objects.annotate(bid=Max("listing__value")).get(id=listing_id);
+        # onWatchlist = request.user.watchlist_users.filter(id=listing_id).exists()
+        listing.watchlist = listing.users.filter(id=request.user.id).exists()
         listing.comments = Comment.objects.filter(listing__id=listing_id).order_by('-created_at').all()
-
-        # can probably do this via an annotation?
-        watchlist = False
-        if Listing.objects.filter(id=listing_id).filter(users__id=request.user.id):
-            watchlist = True
 
         return render(request, "auctions/listing.html", {
             "listing": listing,
-            "watchlist": watchlist,
+            "status": status,
         })
 
 
 @login_required(login_url='/login_view')
 def place_bid(request, listing_id):
+    print(listing_id)
     if request.method == "POST":
         value = request.POST["bid"]
-        print(value)
         # TODO: validate
-        listing = Listing.objects.get(id=listing_id);
-        bid = Bid(value=value, owner=request.user, listing=listing)
-        bid.save()
-        return HttpResponseRedirect(reverse("index"))
+        listing = Listing.objects.annotate(bid=Max("listing__value")).get(id=listing_id);
+        if not listing.bid:
+            if int(value) < listing.starting_bid:
+                status = {
+                    "code": '400',
+                    "msg": 'Your bid is too low!',
+                }
+            else:
+                bid = Bid(value=value, owner=request.user, listing=listing)
+                bid.save() 
+                status = {
+                    "code": '200',
+                    "msg": 'Success!',
+                }
+        elif int(value) <= listing.bid:
+            status = {
+                "code": '400',
+                "msg": 'Your bid is too low!',
+            }
+        else:
+            bid = Bid(value=value, owner=request.user, listing=listing)
+            bid.save() 
+            status = {
+                "code": '200',
+                "msg": 'Success!',
+            }
+        return HttpResponseRedirect(reverse("listing" , args=(listing_id, )) + "?code=" + status["code"] + "&msg=" + status["msg"])
     return HttpResponseRedirect(reverse("index"))
 
 @login_required(login_url='/login_view')
@@ -158,11 +186,10 @@ def watchlist(request):
         listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     else:
-        watchlist_listings = Listing.objects.filter(users__id=request.user.id).all()
+        watchlist_listings = Listing.objects.filter(users__id=request.user.id).annotate(bid=Max("listing__value")).all()
         return render(request, "auctions/watchlist.html", {
             "watchlist_listings": watchlist_listings
         })
-
 
 @login_required(login_url='/login_view')
 def comment(request, listing_id):

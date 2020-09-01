@@ -5,47 +5,50 @@
             <section class="listing__head">
                 <img src="{{ listing.image_url }}" class="listing__head--img"/>
                 <div class="listing__head--details">
-                    <h2>{{ listing.title }}</h2>
-                    <p>{{listing.category.value}}</p>
-                    {% if listing.bid %}
-                       <p>Current bid: R {{ listing.bid }}</p>
-                    {% else %}
-                        <p>Starting bid: R {{ listing.starting_bid }}</p>
+                    <!-- <h2>{{ listing.title }}<br><span class="status__success">{{ status.msg }}</span></h2> -->
+                     <h2>{{ listing.title }}
+                        {% if status.code == '200' %}
+                            <br><span class="status status__success">{{ status.msg }}</span>
+                        {% elif status.code != '' %}
+                            <br><span class="status status__error">{{ status.msg }}</span>
                     {% endif %}
-                    {% if user.is_authenticated and user.id != listing.owner.id %}
-                        {% if watchlist %}
-                        <form action="{% url 'watchlist' %}" method="POST">
-                            {% csrf_token %}
-                            <input name="listing_id" value="{{ listing.id }}" hidden>
-                            <input name="toggle" value="remove" hidden>
-                            <input type="submit" value="Remove from watchlist"> 
-                        </form>
+                    </h2>
+                    <p>{{ listing.category.value }}</p>
+                        {% if listing.bid %}
+                           <p>Current bid: R {{ listing.bid }}</p>
                         {% else %}
-                        <form action="{% url 'watchlist' %}" method="POST">
-                            {% csrf_token %}
-                            <input name="listing_id" value="{{ listing.id }}" hidden>
-                            <input name="toggle" value="add" hidden>
-                            <input type="submit" value="Add from watchlist"> 
-                        </form>
+                            <p>Starting bid: R {{ listing.starting_bid }}</p>
                         {% endif %}
-                    {% endif %}
-                    {% if user.id != listing.owner.id %}
-                        <form action="{% url 'place_bid' listing.id %}" method="post">
-                            {% csrf_token %}
-                            {% if listing.bid %}
-                            <input name="bid" type="number" min="{{ listing.bid | add:'1' }}"  placeholder="Minimum bid is R {{ listing.bid | add:'1' }}" />
+                        {% if user.is_authenticated and user.id != listing.owner.id %}
+                            {% if listing.watchlist %}
+                            <form action="{% url 'watchlist' %}" method="POST">
+                                {% csrf_token %}
+                                <input name="listing_id" value="{{ listing.id }}" hidden>
+                                <input name="toggle" value="remove" hidden>
+                                <input type="submit" value="Remove from watchlist"> 
+                            </form>
                             {% else %}
-                            <input name="bid" type="number" min="{{ listing.starting_bid }}"  placeholder="Minimum bid is R {{ listing.starting_bid }}" />
+                            <form action="{% url 'watchlist' %}" method="POST">
+                                {% csrf_token %}
+                                <input name="listing_id" value="{{ listing.id }}" hidden>
+                                <input name="toggle" value="add" hidden>
+                                <input type="submit" value="Add to watchlist"> 
+                            </form>
                             {% endif %}
-                            <input type="submit" value="Make bid!">
-                        </form>
-                    {% elif listing.num_bids > 0 and listing.active %}
-                        <form action="{% url 'accept_bid' listing.id %}" method="POST">
-                            {% csrf_token %}
-                            <input type="text" name="bid_id" value="{{ listing.max_bid.id }}" hidden>
-                            <input type="submit" value="Accept bid">
-                        </form>
-                    {% endif %}
+                        {% endif %}
+                        {% if user.id != listing.owner.id %}
+                            <form action="{% url 'place_bid' listing.id %}" method="post">
+                                {% csrf_token %}
+                                <input name="bid" type="number"  placeholder="eg {{ listing.bid | add:'50' }}" />
+                                <input type="submit" value="Make bid!">
+                            </form>
+                        {% elif listing.num_bids > 0 and listing.active %}
+                            <form action="{% url 'accept_bid' listing.id %}" method="POST">
+                                {% csrf_token %}
+                                <input type="text" name="bid_id" value="{{ listing.max_bid.id }}" hidden>
+                                <input type="submit" value="Accept bid">
+                            </form>
+                        {% endif %}
                     <div>{{ listing.description }}</div>
                 </div>
             </section>

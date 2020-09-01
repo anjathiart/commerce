@@ -21,9 +21,9 @@
                     {% endif %}
                     <h6>{{ listing.title }}</h5>
                     {% if listing.bid %}
-                    <p class="pricetag">{{ listing.bid }}</p>
+                    <p class="pricetag">R {{ listing.bid }}</p>
                     {% else %}
-                    <p class="pricetag">{{ listing.starting_bid }}</p>
+                    <p class="pricetag">R {{ listing.starting_bid }}</p>
                     {% endif %}
             		<p class="p--tiny description">{{ listing.description }}</p>
                 </div>
