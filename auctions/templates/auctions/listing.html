@@ -5,6 +5,7 @@
             <section class="listing__head">
                 <img src="{{ listing.image_url }}" class="listing__head--img"/>
                 <div class="listing__head--details">
+                    <em class="p--tiny" align="right">Listed by {% if user.id == listing.user.id %} You {% else %} {{ listing.user.username }} {% endif %} on {{listing.created_at}}</em>
                     <!-- <h2>{{ listing.title }}<br><span class="status__success">{{ status.msg }}</span></h2> -->
                      <h2>{{ listing.title }}
                         {% if status.code == '200' %}
@@ -13,13 +14,22 @@
                             <br><span class="status status__error">{{ status.msg }}</span>
                     {% endif %}
                     </h2>
-                    <p>{{ listing.category.value }}</p>
-                        {% if listing.bid %}
-                           <p>Current bid: R {{ listing.bid }}</p>
+                    <p>Category: {{ listing.category.value }}</p>
+                        {% if bids %}
+                           <p><strong>R {{ bids.0.value }} </strong> <small align="right"> - {{ bids|length }} bid(s) so far</small></p>
+                           <em class="p--tiny">
+                                 Latest bid made by 
+                                    {% if bids.0.user.id == user.id %} You! {% else %} {{ bids.0.user.username }} {% endif %} on {{ bids.0.created_at|date:"M d, Y" }}
+                            </em>
                         {% else %}
-                            <p>Starting bid: R {{ listing.starting_bid }}</p>
+                            
+                            <p><strong>R {{ listing.starting_bid }}</strong></p>
+                            <em>
+                                 Be the first to make a bid!
+                            </em>
                         {% endif %}
-                        {% if user.is_authenticated and user.id != listing.owner.id %}
+
+                        {% if user.is_authenticated and user.id != listing.user.id %}
                             {% if listing.watchlist %}
                             <form action="{% url 'watchlist' %}" method="POST">
                                 {% csrf_token %}
@@ -36,16 +46,16 @@
                             </form>
                             {% endif %}
                         {% endif %}
-                        {% if user.id != listing.owner.id %}
+                        {% if user.id != listing.user.id %}
                             <form action="{% url 'place_bid' listing.id %}" method="post">
                                 {% csrf_token %}
                                 <input name="bid" type="number"  placeholder="eg {{ listing.bid | add:'50' }}" />
                                 <input type="submit" value="Make bid!">
                             </form>
-                        {% elif listing.num_bids > 0 and listing.active %}
+                        {% elif bids|length > 0 and listing.active %}
                             <form action="{% url 'accept_bid' listing.id %}" method="POST">
                                 {% csrf_token %}
-                                <input type="text" name="bid_id" value="{{ listing.max_bid.id }}" hidden>
+                                <input type="text" name="bid_id" value="{{ bids.0.id }}" hidden>
                                 <input type="submit" value="Accept bid">
                             </form>
                         {% endif %}
