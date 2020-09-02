@@ -15,7 +15,17 @@ p {
 }
 
 .p--tiny {
-  font-size: 12px;
+  font-size: 14px;
+}
+
+.flex-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.flex-inline > span {
+  font-size: 30px;
+  color: black;
 }
 
 input {
@@ -119,6 +129,19 @@ textarea {
   padding-top: 0.5rem;
   height: 50%;
   margin-top: auto;
+}
+.listing__head--details > h2, .listing__head--details h1 {
+  margin-bottom: 0px;
+}
+
+.imageContainer {
+  position: relative;
+}
+.imageContainer form {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 92%;
 }
 
 .status {

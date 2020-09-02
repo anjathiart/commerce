@@ -24,7 +24,15 @@ p
 	margin: 0px
 
 .p--tiny
-	font-size: 12px
+	font-size: 14px
+
+.flex-inline
+	display: flex
+	justify-content: space-between
+	align-items: center
+	> span
+		font-size: 30px
+		color: black
 
 input 
 	padding: 0px 10px 
@@ -111,6 +119,28 @@ textarea
 				padding-top: 0.5rem
 				height: 50%
 				margin-top: auto
+			> h2, h1
+				margin-bottom: 0px
+
+.watchlist
+	&__btn
+		&--remove
+			// background-color: lightyellow
+		&--add
+			// background-color: rgba(magenta, 0.3)
+			// color: black
+			// background-color: magenta
+
+
+.imageContainer
+	position: relative
+	form
+		position: absolute
+		top: 10px
+		left: 10px
+		width: 92%
+
+
 
 .status
 	max-width: 200px

@@ -3,65 +3,69 @@
 {% block body %}
         <div class="view__main listing">
             <section class="listing__head">
-                <img src="{{ listing.image_url }}" class="listing__head--img"/>
+
+                <div class="imageContainer">
+                    <img src="{{ listing.image_url }}" class="listing__head--img"/>
+                    <form action="{% url 'watchlist' %}" method="POST">
+                        {% csrf_token %}
+                        <input name="listing_id" value="{{ listing.id }}" hidden>
+                        {% if listing.watchlist %}
+                        <input name="toggle" value="remove" hidden>
+                        <p class="flex-inline"><input type="submit" value="Remove from watchlist" class="btn btn-secondary p--tiny watchlist__btn watchlist__btn--remove"><span>❤️<span></p>
+                        {% else %}
+                        <input name="toggle" value="add" hidden>
+                        <p class="flex-inline"><input type="submit" value="Add to watchlist" class="btn btn-primary p--tiny watchlist__btn--add"></p>
+                        {% endif %}
+                    </form>
+                </div>
+
                 <div class="listing__head--details">
-                    <em class="p--tiny" align="right">Listed by {% if user.id == listing.user.id %} You {% else %} {{ listing.user.username }} {% endif %} on {{listing.created_at}}</em>
-                    <!-- <h2>{{ listing.title }}<br><span class="status__success">{{ status.msg }}</span></h2> -->
-                     <h2>{{ listing.title }}
-                        {% if status.code == '200' %}
-                            <br><span class="status status__success">{{ status.msg }}</span>
-                        {% elif status.code != '' %}
-                            <br><span class="status status__error">{{ status.msg }}</span>
-                    {% endif %}
+
+                     <h2>{{ listing.title }} <br>
+                     	{% if status.code == '200' %} 
+                     	<span class="status status__success"> {% elif status.code != '' %} <span class="status status__error">{% endif %}
+                     		{{ status.msg }}
+                     	</span>
                     </h2>
-                    <p>Category: {{ listing.category.value }}</p>
+                	<em class="p--tiny">
+                		Listed in {{ listing.category.value }} by {% if user.id == listing.user.id %} You {% else %} {{ listing.user.username }} {% endif %} on {{listing.created_at}}
+                	</em>
+                	<br>
+
+
+
                         {% if bids %}
-                           <p><strong>R {{ bids.0.value }} </strong> <small align="right"> - {{ bids|length }} bid(s) so far</small></p>
+                           <h3><strong>R {{ bids.0.value }} </strong> <small align="right"> - {{ bids|length }} bid(s) so far</small></h3>
                            <em class="p--tiny">
                                  Latest bid made by 
                                     {% if bids.0.user.id == user.id %} You! {% else %} {{ bids.0.user.username }} {% endif %} on {{ bids.0.created_at|date:"M d, Y" }}
                             </em>
                         {% else %}
-                            
-                            <p><strong>R {{ listing.starting_bid }}</strong></p>
-                            <em>
-                                 Be the first to make a bid!
-                            </em>
-                        {% endif %}
-
-                        {% if user.is_authenticated and user.id != listing.user.id %}
-                            {% if listing.watchlist %}
-                            <form action="{% url 'watchlist' %}" method="POST">
-                                {% csrf_token %}
-                                <input name="listing_id" value="{{ listing.id }}" hidden>
-                                <input name="toggle" value="remove" hidden>
-                                <input type="submit" value="Remove from watchlist"> 
-                            </form>
-                            {% else %}
-                            <form action="{% url 'watchlist' %}" method="POST">
-                                {% csrf_token %}
-                                <input name="listing_id" value="{{ listing.id }}" hidden>
-                                <input name="toggle" value="add" hidden>
-                                <input type="submit" value="Add to watchlist"> 
-                            </form>
+                            <h3><strong>R {{ listing.starting_bid }}</strong><small align="right"> - 0 bids so far</small></h3>
+                            {% if user.id != listing.user.id %}<em>Be the first to make a bid!</em>
+                            {% else %}<em>Sorry, nobody has placed a bid on your listing!</em>
                             {% endif %}
                         {% endif %}
+
+            
                         {% if user.id != listing.user.id %}
                             <form action="{% url 'place_bid' listing.id %}" method="post">
                                 {% csrf_token %}
-                                <input name="bid" type="number"  placeholder="eg {{ listing.bid | add:'50' }}" />
+                                <input name="bid" type="number"  placeholder="Your bid offer" />
                                 <input type="submit" value="Make bid!">
                             </form>
                         {% elif bids|length > 0 and listing.active %}
                             <form action="{% url 'accept_bid' listing.id %}" method="POST">
                                 {% csrf_token %}
                                 <input type="text" name="bid_id" value="{{ bids.0.id }}" hidden>
-                                <input type="submit" value="Accept bid">
+                                <input type="submit" value="Accept this bid">
                             </form>
                         {% endif %}
-                    <div>{{ listing.description }}</div>
+
+                    <div><p>{{ listing.description }}</p></div>
                 </div>
             </section>
+
             <section class="comments">
                 <div class="comments__new">
                     {% if user.is_authenticated %}
