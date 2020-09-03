@@ -13,5 +13,6 @@ urlpatterns = [
     path('watchlist', views.watchlist, name='watchlist'),
     path('comment/<str:listing_id>', views.comment, name='comment'),
     path('accept_bid.<str:listing_id>', views.accept_bid, name="accept_bid"),
+    path('yourbids', views.your_bids, name="yourbids"),
     # path('filter/<str:category_id>', views.filter, name="filter")
 ]

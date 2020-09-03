@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <section class="view view__main">
+        {% if yourbids_listings %}
+        <h2>Listings you've made bids on</h2>
+        <div class="listings">
+            {% for listing in yourbids_listings %}
+            <form action="{% url 'listing' listing.id %}">
+                <div class="listings__card" onclick="javascript:this.parentNode.submit();">
+                    <p> {% if listing.winner.id == user.id %} You won!
+                    {% elif not listing.active %} Sorry! You lost!
+                    {% else %} <p>You're still in the game! {% endif %}</p>
+                	{% if listing.image_url %}
+                    <p class="img"><img src="{{ listing.image_url }}"/></p>
+                    {% else %}
+                    <p class="img__placeholder"></p>
+                    {% endif %}
+                	<h6>{{ listing.title }}</h6>
+                    <p class="pricetag">R {{ listing.bid }}</p>
+                </div>
+            </form>
+            {% endfor %}
+        </div>
+        {% else %}
+        <h2>You have not placed any bids yet!</h2>
+        {% endif %}
+    </section>
+{% endblock %}

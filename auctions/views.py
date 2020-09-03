@@ -205,6 +205,20 @@ def watchlist(request):
             "watchlist_listings": watchlist_listings
         })
 
+
+@login_required(login_url='/login_view')
+def your_bids(request):
+    if Bid.objects.filter(user_id=request.user.id).exists():
+        yourbid = Max('bid', filter=Q(listing__user__id=request.user.id))
+        listings = Listing.objects.filter(listing__user__id=request.user.id)\
+        .annotate(bid=Max("listing__value"))\
+        .all().distinct()
+    else:
+        listings = None
+    return render(request, "auctions/yourbids.html", {
+        "yourbids_listings": listings
+    })
+
 @login_required(login_url='/login_view')
 def comment(request, listing_id):
     if request.method == "POST":
