@@ -134,6 +134,19 @@ textarea {
   margin-bottom: 0px;
 }
 
+.bidForm {
+  display: flex;
+  align-items: center;
+}
+.bidForm > * {
+  line-height: 2;
+}
+.bidForm input[type=number] {
+  width: 280px;
+  padding: 6px 12px;
+  margin-right: 1rem;
+}
+
 .imageContainer {
   position: relative;
 }
@@ -266,6 +279,17 @@ textarea {
   font-weight: 700;
   padding: 2px 8px;
   font-size: 0.85rem;
+}
+
+.bidStatus {
+  padding: 6px 12px;
+  font-size: 24px;
+  font-weight: 100;
+  border: 1px solid #D0E6FD;
+}
+
+.wonBid {
+  font-weight: 700;
 }
 
 .view__new {

@@ -21,46 +21,43 @@
 
                 <div class="listing__head--details">
 
-                     <h2>{{ listing.title }} <br>
-                     	{% if status.code == '200' %} 
-                     	<span class="status status__success"> {% elif status.code != '' %} <span class="status status__error">{% endif %}
-                     		{{ status.msg }}
-                     	</span>
-                    </h2>
-                	<em class="p--tiny">
-                		Listed in {{ listing.category.value }} by {% if user.id == listing.user.id %} You {% else %} {{ listing.user.username }} {% endif %} on {{listing.created_at}}
-                	</em>
-                	<br>
+                     <h2>{{ listing.title }}</h2>
+                     <em class="p--tiny">
+                        Listed in {{ listing.category.value }} by {% if user.id == listing.user.id %} You {% else %} {{ listing.user.username }} {% endif %} on {{listing.created_at}}
+                    </em>
+                    {% if status.code == '200' %} <br><p class="status status__success"> 
+                    {% elif status.code != '' %} <br><p class="status status__error">{% endif %} {{ status.msg }}</p>
+                	
+                    <br>
 
-
-
-                        {% if bids %}
-                           <h3><strong>R {{ bids.0.value }} </strong> <small align="right"> - {{ bids|length }} bid(s) so far</small></h3>
-                           <em class="p--tiny">
-                                 Latest bid made by 
-                                    {% if bids.0.user.id == user.id %} You! {% else %} {{ bids.0.user.username }} {% endif %} on {{ bids.0.created_at|date:"M d, Y" }}
-                            </em>
-                        {% else %}
-                            <h3><strong>R {{ listing.starting_bid }}</strong><small align="right"> - 0 bids so far</small></h3>
-                            {% if user.id != listing.user.id %}<em>Be the first to make a bid!</em>
-                            {% else %}<em>Sorry, nobody has placed a bid on your listing!</em>
-                            {% endif %}
+                    {% if bids %}
+                       <h3><strong>R {{ bids.0.value }} </strong> <small align="right"> - {{ bids|length }} bid(s) so far</small></h3>
+                       <em class="p--tiny">
+                             Latest bid made by 
+                                {% if bids.0.user.id == user.id %} You! {% else %} {{ bids.0.user.username }} {% endif %} on {{ bids.0.created_at|date:"M d, Y" }}
+                        </em>
+                        <br>
+                    {% else %}
+                        <h3><strong>R {{ listing.starting_bid }}</strong><small align="right"> - 0 bids so far</small></h3>
+                        {% if user.id != listing.user.id %}<em>Be the first to make a bid!</em><br>
+                        {% else %}<em>Sorry, nobody has placed a bid on your listing!</em>
                         {% endif %}
+                    {% endif %}
 
-            
-                        {% if user.id != listing.user.id %}
-                            <form action="{% url 'place_bid' listing.id %}" method="post">
-                                {% csrf_token %}
-                                <input name="bid" type="number"  placeholder="Your bid offer" />
-                                <input type="submit" value="Make bid!">
-                            </form>
-                        {% elif bids|length > 0 and listing.active %}
-                            <form action="{% url 'accept_bid' listing.id %}" method="POST">
-                                {% csrf_token %}
-                                <input type="text" name="bid_id" value="{{ bids.0.id }}" hidden>
-                                <input type="submit" value="Accept this bid">
-                            </form>
-                        {% endif %}
+                    {% if user.id != listing.user.id %}
+                        <form action="{% url 'place_bid' listing.id %}" method="post" class="bidForm">
+                            {% csrf_token %}
+                            <input name="bid" type="number"  placeholder="Your bid offer"/>
+                            <input type="submit" value="Make bid!" class="btn btn-primary">
+                        </form>
+                    {% elif bids|length > 0 and listing.active %}
+                        <form action="{% url 'accept_bid' listing.id %}" method="POST" class="bidForm">
+                            {% csrf_token %}
+                            <input type="text" name="bid_id" value="{{ bids.0.id }}" hidden>
+                            <input type="submit" value="Accept this bid" class="btn btn-primary" />
+                        </form>
+                    {% endif %}
+                    <br>
 
                     <div><p>{{ listing.description }}</p></div>
                 </div>

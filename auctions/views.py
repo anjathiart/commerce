@@ -27,7 +27,6 @@ def index(request):
     status['code'] = request.GET.get('code', '')
     status['msg'] = request.GET.get('msg', '')
     print(status)
-    # print(request.GET.get('msg', ''))
     categories = Category.objects.all().order_by('value')
 
     return render(request, "auctions/index.html", {
@@ -225,8 +224,6 @@ def comment(request, listing_id):
         listing = Listing.objects.get(id=listing_id)
         comment = Comment(user=request.user, listing=listing, text=request.POST['comment'])
         comment.save()
-        # listing.comments.add(comment)
-        # listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
 
