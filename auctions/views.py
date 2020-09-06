@@ -19,16 +19,16 @@ def index(request):
         listings.category = category
     else:
         listings = Listing.objects\
-        .annotate(bid=Max("listing__value"))\
         .filter(active=True)\
         .all()
         listing.category = None
+    print(listings[0].bids)
     status = {}
     status['code'] = request.GET.get('code', '')
     status['msg'] = request.GET.get('msg', '')
     print(status)
     categories = Category.objects.all().order_by('value')
-
+            # .annotate(bid=Max("listing__value"))\
     return render(request, "auctions/index.html", {
         "active_listings": listings,
         "categories": categories,
@@ -121,21 +121,24 @@ def listing(request, listing_id=''):
         status['code'] = request.GET.get('code', '')
         status['msg'] = request.GET.get('msg', '')
         print(status)
-        listing = Listing.objects\
-        .annotate(bid=Max("listing__value"))\
-        .annotate(num_bids=Count("listing__id"))\
-        .get(id=listing_id);
-        # onWatchlist = request.user.watchlist_users.filter(id=listing_id).exists()
-        listing.watchlist = listing.users.filter(id=request.user.id).exists()
-        listing.comments = Comment.objects.filter(listing__id=listing_id).order_by('-created_at').all()
-
-        if Bid.objects.filter(listing__id=listing_id).exists():
-            bids = Bid.objects.filter(listing__id=listing_id).order_by('-value').all()
+        listing = Listing.objects.get(id=listing_id)
+        if not listing.bids.exists():
+            listing.bid = None
         else:
-            bids = None
+            listing.bid = listing.bids.order_by('value')[0]
+
+        listing.watchlist = request.user.watchListings.filter(id=listing_id).exists()
+        print(listing.bids)
+        print(listing.comments)
+        # listing.watchlist = listing.users.filter(id=request.user.id).exists()
+        # listing.comments = Comment.objects.filter(listing__id=listing_id).order_by('-created_at').all()
+
+        # if Bid.objects.filter(listing__id=listing_id).exists():
+        #     bids = Bid.objects.filter(listing__id=listing_id).order_by('-value').all()
+        # else:
+        #     bids = None
         return render(request, "auctions/listing.html", {
             "listing": listing,
-            "bids": bids,
             "status": status,
         })
 
@@ -221,9 +224,11 @@ def your_bids(request):
 @login_required(login_url='/login_view')
 def comment(request, listing_id):
     if request.method == "POST":
-        listing = Listing.objects.get(id=listing_id)
-        comment = Comment(user=request.user, listing=listing, text=request.POST['comment'])
+        listing = Listing.objects.filter(id=listing_id).get()
+        comment = Comment(user=request.user, text=request.POST['comment'])
         comment.save()
+        listing.comments.add(comment)
+        listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
 
