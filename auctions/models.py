@@ -20,12 +20,12 @@ bid_id | date | amount (number / real) | user_id (fk) | listing_id (fk) | status
 TODO validators=[MinValueValidator(Decimal('0.01'))]
 '''
 class Bid(models.Model):
-	value = models.DecimalField(max_digits=6, decimal_places=2)
+	value = models.DecimalField(max_digits=12, decimal_places=2)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bid_owner")
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
 
-	def __str__(self):
-		return self.value
+	class Meta:
+		ordering= ["-value"]
 
 
 '''
@@ -36,8 +36,12 @@ class Comment(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	text = models.TextField(blank=True)
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
+
 	def __str__(self):
 		return self.text
+
+	class Meta:
+		ordering= ["-created_at"]
 
 '''
 A listing has a title, description, a starting bid (initial price set by owner). It can be active or inactive.
@@ -54,8 +58,9 @@ class Listing(models.Model):
 	image_url = models.CharField(max_length=1024, null=True)
 	category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE, related_name="listing_category")
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
-	bids = models.ManyToManyField(Bid, blank=True, related_name="bid")
+	bids = models.ManyToManyField(Bid, blank=True, related_name="bidListings")
 	comments = models.ManyToManyField(Comment, blank=True, related_name="listing")
+	
 	def __str__(self):
 		return self.title
 

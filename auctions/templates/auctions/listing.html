@@ -30,11 +30,11 @@
                 	
                     <br>
 
-                    {% if listing.bids.count > 1 %}
-                       <h3><strong>R {{ listing.bids.0.value }} </strong> <small align="right"> - {{ listing.bids|length }} bid(s) so far</small></h3>
+                    {% if listing.bids.count > 0 %}
+                       <h3><strong>R {{ listing.bids.all.0.value }} </strong> <small align="right"> - {{ listing.bids.count }} bid(s) so far</small></h3>
                        <em class="p--tiny">
                              Latest bid made by 
-                                {% if listing.bids.0.user.id == user.id %} You! {% else %} {{ listing.bids.0.user.username }} {% endif %} on {{ listing.bids.0.created_at|date:"M d, Y" }}
+                                {% if listing.bids.all.0.user.id == user.id %} You! {% else %} {{ listing.bids.all.0.user.username }} {% endif %} on {{ listing.bids.all.0.created_at|date:"M d, Y" }}
                         </em>
                         <br>
                     {% else %}
@@ -50,10 +50,10 @@
                             <input name="bid" type="number"  placeholder="Your bid offer"/>
                             <input type="submit" value="Make bid!" class="btn btn-primary">
                         </form>
-                    {% elif listing.bids|length > 0 and listing.active %}
+                    {% elif listing.bids.all.count > 0 and listing.active %}
                         <form action="{% url 'accept_bid' listing.id %}" method="POST" class="bidForm">
                             {% csrf_token %}
-                            <input type="text" name="bid_id" value="{{ listing.bids.0.id }}" hidden>
+                            <input type="text" name="bid_id" value="{{ listing.bids.all.0.id }}" hidden>
                             <input type="submit" value="Accept this bid" class="btn btn-primary" />
                         </form>
                     {% endif %}

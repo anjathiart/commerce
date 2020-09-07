@@ -14,7 +14,6 @@ def index(request):
         category = Category.objects.get(id=category_id)
         listings = category.listing_category\
         .filter(active=True)\
-        .annotate(bid=Max("listing__value"))\
         .all()
         listings.category = category
     else:
@@ -22,11 +21,9 @@ def index(request):
         .filter(active=True)\
         .all()
         listing.category = None
-    print(listings[0].bids)
     status = {}
     status['code'] = request.GET.get('code', '')
     status['msg'] = request.GET.get('msg', '')
-    print(status)
     categories = Category.objects.all().order_by('value')
             # .annotate(bid=Max("listing__value"))\
     return render(request, "auctions/index.html", {
@@ -120,23 +117,14 @@ def listing(request, listing_id=''):
         status = {}
         status['code'] = request.GET.get('code', '')
         status['msg'] = request.GET.get('msg', '')
-        print(status)
+
         listing = Listing.objects.get(id=listing_id)
         if not listing.bids.exists():
-            listing.bid = None
+            listing.price = None
         else:
-            listing.bid = listing.bids.order_by('value')[0]
-
+            listing.price = listing.bids.order_by('-value').all()[0].value
         listing.watchlist = request.user.watchListings.filter(id=listing_id).exists()
-        print(listing.bids)
-        print(listing.comments)
-        # listing.watchlist = listing.users.filter(id=request.user.id).exists()
-        # listing.comments = Comment.objects.filter(listing__id=listing_id).order_by('-created_at').all()
 
-        # if Bid.objects.filter(listing__id=listing_id).exists():
-        #     bids = Bid.objects.filter(listing__id=listing_id).order_by('-value').all()
-        # else:
-        #     bids = None
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "status": status,
@@ -145,32 +133,34 @@ def listing(request, listing_id=''):
 
 @login_required(login_url='/login_view')
 def place_bid(request, listing_id):
-    print(listing_id)
     if request.method == "POST":
         value = request.POST["bid"]
-        # TODO: validate
-        listing = Listing.objects.annotate(bid=Max("listing__value")).get(id=listing_id);
-        if not listing.bid:
+        listing = Listing.objects.get(id=listing_id);
+        if listing.bids.count() == 0:
             if int(value) < listing.starting_bid:
                 status = {
                     "code": '400',
                     "msg": 'Your bid is too low!',
                 }
             else:
-                bid = Bid(value=value, user=request.user, listing=listing)
-                bid.save() 
+                bid = Bid(value=value, user=request.user)
+                bid.save()
+                listing.bids.add(bid)
+                listing.save()
                 status = {
                     "code": '200',
                     "msg": 'Success!',
                 }
-        elif int(value) <= listing.bid:
+        elif int(value) <= listing.bids.order_by('-value').all()[0].value:
             status = {
                 "code": '400',
                 "msg": 'Your bid is too low!',
             }
         else:
-            bid = Bid(value=value, user=request.user, listing=listing)
-            bid.save() 
+            bid = Bid(value=value, user=request.user)
+            bid.save()
+            listing.bids.add(bid)
+            listing.save()
             status = {
                 "code": '200',
                 "msg": 'Success!',
@@ -202,7 +192,7 @@ def watchlist(request):
         listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     else:
-        watchlist_listings = Listing.objects.filter(users__id=request.user.id).annotate(bid=Max("listing__value")).all()
+        watchlist_listings = Listing.objects.filter(users__id=request.user.id).all()
         return render(request, "auctions/watchlist.html", {
             "watchlist_listings": watchlist_listings
         })
@@ -210,11 +200,8 @@ def watchlist(request):
 
 @login_required(login_url='/login_view')
 def your_bids(request):
-    if Bid.objects.filter(user_id=request.user.id).exists():
-        yourbid = Max('bid', filter=Q(listing__user__id=request.user.id))
-        listings = Listing.objects.filter(listing__user__id=request.user.id)\
-        .annotate(bid=Max("listing__value"))\
-        .all().distinct()
+    if Bid.objects.filter(user__id=request.user.id).exists():
+        listings = Listing.objects.filter(bids__user = request.user.id).all().distinct()
     else:
         listings = None
     return render(request, "auctions/yourbids.html", {

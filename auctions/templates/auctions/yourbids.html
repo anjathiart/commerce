@@ -18,7 +18,7 @@
                     <p class="img__placeholder"></p>
                     {% endif %}
                 	<h6>{{ listing.title }}</h6>
-                    <p class="pricetag">R {{ listing.bid }}</p>
+                    <p class="pricetag">R {{ listing.bids.all.0.value }}</p>
                 </div>
             </form>
             {% endfor %}
