@@ -117,7 +117,7 @@ textarea
 			> div:last-child
 				border-top: 1px solid lightgrey
 				padding-top: 0.5rem
-				height: 50%
+				min-height: 50%
 				margin-top: auto
 			> h2, h1
 				margin-bottom: 0px
@@ -131,18 +131,6 @@ textarea
 		width: 280px
 		padding: 6px 12px
 		margin-right: 1rem
-	// input[type=submit]
-	// 	background-color: blue
-
-.watchlist
-	&__btn
-		&--remove
-			// background-color: lightyellow
-		&--add
-			// background-color: rgba(magenta, 0.3)
-			// color: black
-			// background-color: magenta
-
 
 .imageContainer
 	position: relative
@@ -220,7 +208,8 @@ textarea
 
 
 .listings
-	display: inline-flex
+	display: flex
+	flex-wrap: wrap
 	width: 100%
 	padding: 1rem
 	&__card

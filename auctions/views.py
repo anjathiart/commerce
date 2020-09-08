@@ -94,10 +94,11 @@ def create_new(request):
         description = request.POST["description"]
         starting_bid = request.POST["starting_bid"]
         image_url = request.POST["image_url"]
+        print(image_url)
         category_id = request.POST["category"]
         category = Category.objects.get(id=category_id)
         # save to db
-        listing = Listing(title=title, description=description, category=category, starting_bid=starting_bid, active=True, user=request.user)
+        listing = Listing(title=title, description=description, category=category, starting_bid=starting_bid, active=True, owner=request.user)
         listing.save()
 
         # redirect
@@ -110,7 +111,7 @@ def create_new(request):
         })
 
 
-def listing(request, listing_id=''):
+def listing(request, listing_id):
     if request.method == "POST":
         pass
     else:

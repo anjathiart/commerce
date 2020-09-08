@@ -1,10 +1,10 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <!-- <h2>Active Listings</h2> -->
     <section class="view view__listings">
         <nav class="categoryLinks debug">
             <ul class="nav sideNav">
+                <li><h4>Results: {% if active_listings.category %}{{ active_listings.category }} {% else %} all {% endif %}</h4></li>
                 {% for category in categories %}
                 <li><a href="{% url 'index' %}?category_id={{ category.id }}" >{{ category.value }}</a></li>
                 {% endfor %}
@@ -19,13 +19,14 @@
                     {% else %}
                     <p class="img__placeholder"></p>
                     {% endif %}
+                    <br>
                     <h6>{{ listing.title }}</h5>
                     {% if listing.bids.count > 0 %}
                     <p class="pricetag">R {{ listing.bids.all.0.value }}</p>
                     {% else %}
                     <p class="pricetag">R {{ listing.starting_bid }}</p>
                     {% endif %}
-            		<p class="p--tiny description">{{ listing.description }}</p>
+            		<p class="p--tiny description">{{ listing.description|truncatewords:"12" }}</p>
                 </div>
             </form>
             {% endfor %}

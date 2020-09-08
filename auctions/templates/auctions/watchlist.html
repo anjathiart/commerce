@@ -2,7 +2,11 @@
 
 {% block body %}
     <section class="view view__main">
+        {% if watchlist_listings %}
         <h2>Your watchlist items</h2>
+        {% else %}
+        <h2>You have no items in your watchlist!</h2>
+        {% endif %}
         <div class="listings">
             {% for listing in watchlist_listings %}
             <form action="{% url 'listing' listing.id %}">
@@ -18,7 +22,7 @@
                     {% else %}
                     <p class="pricetag">R {{ listing.starting_bid }}</p>
                     {% endif %}
-                    <p class="p--tiny description">{{ listing.description }}</p>
+                    <p class="p--tiny description">{{ listing.description|truncatewords:"12" }}</p>
                 </div>
             </form>
             {% endfor %}

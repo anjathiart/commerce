@@ -55,7 +55,7 @@ class Listing(models.Model):
 	users = models.ManyToManyField(User, blank=True, related_name="watchListings")
 	active = models.BooleanField(default=True)
 	winner = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name="listingsWon")
-	image_url = models.CharField(max_length=1024, null=True)
+	image_url = models.TextField(null=True, blank=True)
 	category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE, related_name="listing_category")
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
 	bids = models.ManyToManyField(Bid, blank=True, related_name="bidListings")

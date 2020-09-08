@@ -127,7 +127,7 @@ textarea {
 .listing__head--details > div:last-child {
   border-top: 1px solid lightgrey;
   padding-top: 0.5rem;
-  height: 50%;
+  min-height: 50%;
   margin-top: auto;
 }
 .listing__head--details > h2, .listing__head--details h1 {
@@ -234,7 +234,8 @@ textarea {
 }
 
 .listings {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   width: 100%;
   padding: 1rem;
 }
