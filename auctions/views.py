@@ -8,6 +8,9 @@ from django.db.models import Max, Count, Q, F
 from .models import User, Listing, Bid, Comment, Category
 
 
+'''
+GET view and entry point of website. This view provides all the listings or can also provide listings filtered by category, depending on the get params
+'''
 def index(request):
     category_id = request.GET.get('category_id', '')
     if category_id:
@@ -25,7 +28,6 @@ def index(request):
     status['code'] = request.GET.get('code', '')
     status['msg'] = request.GET.get('msg', '')
     categories = Category.objects.all().order_by('value')
-            # .annotate(bid=Max("listing__value"))\
     return render(request, "auctions/index.html", {
         "active_listings": listings,
         "categories": categories,
@@ -85,6 +87,10 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+'''
+POST view for creating a new listing. GET view for viewing the create new listing form
+TODO: add backend validation.
+'''
 @login_required(login_url='/login_view')
 def create_new(request):
     if request.method == "POST":
@@ -94,11 +100,10 @@ def create_new(request):
         description = request.POST["description"]
         starting_bid = request.POST["starting_bid"]
         image_url = request.POST["image_url"]
-        print(image_url)
         category_id = request.POST["category"]
         category = Category.objects.get(id=category_id)
         # save to db
-        listing = Listing(title=title, description=description, category=category, starting_bid=starting_bid, active=True, owner=request.user)
+        listing = Listing(title=title, description=description, category=category, starting_bid=starting_bid, active=True, owner=request.user, image_url=image_url)
         listing.save()
 
         # redirect
@@ -110,7 +115,9 @@ def create_new(request):
             "categories": categories
         })
 
-
+'''
+GET view to display a listing with details. a status object is also sent to the template for any messages that needs to be displayed
+'''
 def listing(request, listing_id):
     if request.method == "POST":
         pass
@@ -118,7 +125,6 @@ def listing(request, listing_id):
         status = {}
         status['code'] = request.GET.get('code', '')
         status['msg'] = request.GET.get('msg', '')
-
         listing = Listing.objects.get(id=listing_id)
         if not listing.bids.exists():
             listing.price = None
@@ -132,6 +138,10 @@ def listing(request, listing_id):
         })
 
 
+'''
+POST view for placing a bid. Bid logic / validation is handled in the backend and status message / code is sent back to the 
+listing view so that it can be displayed on the listing page.
+'''
 @login_required(login_url='/login_view')
 def place_bid(request, listing_id):
     if request.method == "POST":
@@ -169,6 +179,11 @@ def place_bid(request, listing_id):
         return HttpResponseRedirect(reverse("listing" , args=(listing_id, )) + "?code=" + status["code"] + "&msg=" + status["msg"])
     return HttpResponseRedirect(reverse("index"))
 
+
+'''
+POST view for a listing owner to accept a bid. The listing is then changed to inactive and a winner assigned.
+... redirects to the index page.
+'''
 @login_required(login_url='/login_view')
 def accept_bid(request, listing_id):
     if request.method == "POST":
@@ -180,6 +195,11 @@ def accept_bid(request, listing_id):
         return HttpResponseRedirect(reverse("index"))
     return HttpResponseRedirect(reverse("index"))
 
+
+'''
+POST view to add or remove a listing to a user's watchlist.
+GET view to view a page showing all the listings on the user's watchlist.
+'''
 @login_required(login_url='/login_view')
 def watchlist(request):
     if request.method == "POST":
@@ -199,6 +219,9 @@ def watchlist(request):
         })
 
 
+'''
+GET view that shows a page with all the listings that a user has made bids on.
+'''
 @login_required(login_url='/login_view')
 def your_bids(request):
     if Bid.objects.filter(user__id=request.user.id).exists():
@@ -209,14 +232,19 @@ def your_bids(request):
         "yourbids_listings": listings
     })
 
+
+'''
+POST view to add a comment to a listing. Once the listing is made, the page is reloaded and the new comment displayed.
+'''
 @login_required(login_url='/login_view')
 def comment(request, listing_id):
     if request.method == "POST":
-        listing = Listing.objects.filter(id=listing_id).get()
-        comment = Comment(user=request.user, text=request.POST['comment'])
-        comment.save()
-        listing.comments.add(comment)
-        listing.save()
+        if request.POST['comment']:
+            listing = Listing.objects.filter(id=listing_id).get()
+            comment = Comment(user=request.user, text=request.POST['comment'])
+            comment.save()
+            listing.comments.add(comment)
+            listing.save()
         return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
 

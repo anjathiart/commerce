@@ -7,4 +7,5 @@ This project is deliberatly done without any javascript.
 ## Notes
 
 1. In hindsight 'bid' and 'comment' models should have a foreign key relationship to 'listing', because a bid and / or a comment cannot share more than one listing.
+2. Error / exception handling has not been implemented extensively.
 

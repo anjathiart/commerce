@@ -249,6 +249,7 @@ textarea {
   cursor: pointer;
   transform: scale(1);
   transition: all 0.1s;
+  margin-bottom: 1rem;
 }
 .listings__card:hover {
   transform: scale(1.025);

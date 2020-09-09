@@ -16,7 +16,8 @@
                     {% else %}
                     <p class="img__placeholder"></p>
                     {% endif %}
-                	<h6>{{ listing.title }}</h6>
+                    <br>
+                	<h6>{{ listing.title|truncatewords:"8" }}</h6>
                     {% if listing.bids.all.count > 0 %}
                     <p class="pricetag">R {{ listing.bids.all.0.value }}</p>
                     {% else %}

@@ -3,7 +3,6 @@
 {% block body %}
         <div class="view__main listing">
             <section class="listing__head">
-
                 <div class="imageContainer">
                     <img src="{{ listing.image_url }}" class="listing__head--img"/>
                     <form action="{% url 'watchlist' %}" method="POST">
@@ -47,7 +46,7 @@
                     {% if user.id != listing.owner.id %}
                         <form action="{% url 'place_bid' listing.id %}" method="post" class="bidForm">
                             {% csrf_token %}
-                            <input name="bid" type="number"  placeholder="Your bid offer"/>
+                            <input name="bid" type="number" min="0" placeholder="Your bid offer" required/>
                             <input type="submit" value="Make bid!" class="btn btn-primary">
                         </form>
                     {% elif listing.bids.all.count > 0 and listing.active %}

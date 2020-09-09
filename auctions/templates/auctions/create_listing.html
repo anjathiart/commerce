@@ -12,7 +12,7 @@
 	    	<div class="form-group">
 		    	<p>Category:</p>
 		    	<select name="category" placeholder="Choose...">
-		    		<option value="none">None</option>
+		    		<option value="9">None</option>
 		    		{% for category in categories %}
 		    		<option value="{{ category.id }}">{{ category.value }}</option>
 		    		{% endfor %}
@@ -20,7 +20,7 @@
 		    </div>
 		    <div class="form-group">
 		    	<p>Starting Bid (ZAR):</p>
-		    	<input type="number" min="0.01" step="any" name="starting_bid" placeholder="eg. 50.00">
+		    	<input type="number" min="0.01" step="any" name="starting_bid" placeholder="eg. 50.00" required>
 		    </div>
 		    <div class="form-group">
 		    	<p>Description:</p>
@@ -28,7 +28,7 @@
 		    </div>
 		    <div class="form-group">
 		    	<p>Image url:</p>
-		    	<input id="imgUrl" type="text" name="image_url" placeholder="Add an image link related to your item...">
+		    	<input id="imgUrl" type="url" name="image_url" placeholder="Add an image link related to your item...">
 		    </div>
 		     <div class="form-group">
 	    		<input  type="submit" value="Save and List" class="btn btn-primary">

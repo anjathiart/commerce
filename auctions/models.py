@@ -6,7 +6,7 @@ class User(AbstractUser):
 		return self.username
 
 '''
-A category has a value and can have many listings associated with it
+A model for all possible categories that a user can assign a listing to
 '''
 class Category(models.Model):
 	value = models.CharField(max_length=128)
@@ -15,9 +15,7 @@ class Category(models.Model):
 
 
 '''
-Bids are linked to a particular listing and a particular user
-bid_id | date | amount (number / real) | user_id (fk) | listing_id (fk) | status
-TODO validators=[MinValueValidator(Decimal('0.01'))]
+A bid is made by a user and has a value and data associated with it
 '''
 class Bid(models.Model):
 	value = models.DecimalField(max_digits=12, decimal_places=2)
@@ -29,8 +27,7 @@ class Bid(models.Model):
 
 
 '''
-A comment is made by a particular user and on a particular listing
-comment_id | date | user_id | listing_id
+A comment is made by a particular user
 '''
 class Comment(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -44,8 +41,8 @@ class Comment(models.Model):
 		ordering= ["-created_at"]
 
 '''
-A listing has a title, description, a starting bid (initial price set by owner). It can be active or inactive.
-A listing cas have many bids and comments  associated with it. A listing can belong to a category
+A listing has a title, description, image link, a starting bid (initial price set by owner). It can be active or inactive.
+A listing can have many bids and comments associated with it. A listing can belong to a category. Once a bid is accepted, a listing also has a winner
 '''
 class Listing(models.Model):
 	title = models.CharField(max_length=256)
