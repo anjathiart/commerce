@@ -19,7 +19,8 @@
                 </div>
 
                 <div class="listing__head--details">
-
+                    {% if listing.winner and listing.winner.id == user.id %} <p class="status status__success">YOU WON!</p><br>
+                    {% elif not listing.active %}<p class="status status__error">CLOSED</p><br>{% endif %}
                      <h2>{{ listing.title }}</h2>
                      <em class="p--tiny">
                         Listed in {{ listing.category.value }} by {% if user.id == listing.owner.id %} You {% else %} {{ listing.owner.username }} {% endif %} on {{listing.created_at}}
@@ -29,21 +30,54 @@
                 	
                     <br>
 
+
+
                     {% if listing.bids.count > 0 %}
-                       <h3><strong>R {{ listing.bids.all.0.value }} </strong> <small align="right"> - {{ listing.bids.count }} bid(s) so far</small></h3>
+                        {% if listing.active %}
+                       <h3>
+                            <strong>R {{ listing.bids.all.0.value }} </strong>
+                            <small align="right"> - {{ listing.bids.count }} bid(s) so far</small>
+                        </h3>
                        <em class="p--tiny">
                              Latest bid made by 
                                 {% if listing.bids.all.0.user.id == user.id %} You! {% else %} {{ listing.bids.all.0.user.username }} {% endif %} on {{ listing.bids.all.0.created_at|date:"M d, Y" }}
                         </em>
                         <br>
+                        {% elif listing.winner %}
+                        <h3>
+                            <strong>R {{ listing.bids.all.0.value }} </strong>
+                            <small align="right"> - {{ listing.bids.count }} bid(s) in total</small>
+                        </h3>
+                       <em class="p--tiny">  
+                            {% if listing.winner.id == user.id %} You! {% else %} {{ listing.winner.username }} {% endif %} won the auction!
+                        </em>
+                        <br>
+                        {% else %}
+                        <h3>
+                            <strong>R {{ listing.bids.all.0.value }} </strong>
+                            <small align="right"> - {{ listing.bids.count }} bid(s) in total</small>
+                        </h3>
+                        <em>This auction listing has been closed!</em>
+                        {% endif %}
                     {% else %}
-                        <h3><strong>R {{ listing.starting_bid }}</strong><small align="right"> - 0 bids so far</small></h3>
-                        {% if user.id != listing.owner.id %}<em>Be the first to make a bid!</em><br>
-                        {% else %}<em>Sorry, nobody has placed a bid on your listing!</em>
+                        {% if listing.active %}
+                            <h3>
+                                <strong>R {{ listing.starting_bid }}</strong>
+                                <small align="right"> - 0 bids so far</small>
+                            </h3>
+                            {% if user.id != listing.owner.id %}<em>Be the first to make a bid!</em><br>
+                            {% else %}<em>Sorry, nobody has placed a bid on your listing!</em>
+                            {% endif %}
+                        {% else %}
+                            <h3>
+                                <strong>R {{ listing.starting_bid }}</strong>
+                                <small align="right"> - 0 total bids</small>
+                            </h3>
+                            <em>This auction listing has been closed!</em>
                         {% endif %}
                     {% endif %}
 
-                    {% if user.id != listing.owner.id %}
+                    {% if user.id != listing.owner.id  and listing.active %}
                         <form action="{% url 'place_bid' listing.id %}" method="post" class="bidForm">
                             {% csrf_token %}
                             <input name="bid" type="number" min="0" placeholder="Your bid offer" required/>
@@ -64,7 +98,7 @@
 
             <section class="comments">
                 <div class="comments__new">
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and listing.active %}
                         <form action="{% url 'comment' listing.id %}" method="POST">
                             {% csrf_token %}
                             <textarea name="comment" placeholder="Leave a comment..."></textarea>
