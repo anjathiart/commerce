@@ -8,11 +8,15 @@
             {% for listing in yourbids_listings %}
             <form action="{% url 'listing' listing.id %}">
                 <div class="listings__card" onclick="javascript:this.parentNode.submit();">
-                    <p class="bidStatus"> {% if listing.winner.id == user.id %} <span class="wonBid">You won!</span>
-                    {% elif not listing.active %} Sorry! You lost!
-                    {% else %} You're still in the game! {% endif %}</p>
+
+                    {% if listing.winner.id == user.id %}
+                        <p class="status status__success">YOU WON!</p>
+                    {% elif not listing.active %}
+                        <p class="status status__error">CLOSED!</p>
+                    {% else %}
+                         <p class="status status__warning">STILL GOING!</p>
+                     {% endif %}
                 	{% if listing.image_url %}
-                    <br>
                     <p class="img"><img src="{{ listing.image_url }}"/></p>
                     {% else %}
                     <p class="img__placeholder"></p>

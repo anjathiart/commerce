@@ -175,6 +175,11 @@ textarea {
   color: red;
   background-color: rgba(255, 0, 0, 0.2);
 }
+.status__warning {
+  padding: 6px 12px;
+  color: orange;
+  background-color: rgba(255, 165, 0, 0.2);
+}
 
 .comments {
   width: 100%;
