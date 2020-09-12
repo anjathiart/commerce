@@ -91,7 +91,7 @@ def register(request):
 POST view for creating a new listing. GET view for viewing the create new listing form
 TODO: add backend validation.
 '''
-@login_required(login_url='/login_view')
+@login_required(login_url='/login')
 def create_new(request):
     if request.method == "POST":
 
@@ -130,7 +130,10 @@ def listing(request, listing_id):
             listing.price = None
         else:
             listing.price = listing.bids.order_by('-value').all()[0].value
-        listing.watchlist = request.user.watchListings.filter(id=listing_id).exists()
+        if request.user.is_authenticated:
+            listing.watchlist = request.user.watchListings.filter(id=listing_id).exists()
+        else:
+            listing.watchlist = False
 
         return render(request, "auctions/listing.html", {
             "listing": listing,
@@ -142,7 +145,7 @@ def listing(request, listing_id):
 POST view for placing a bid. Bid logic / validation is handled in the backend and status message / code is sent back to the 
 listing view so that it can be displayed on the listing page.
 '''
-@login_required(login_url='/login_view')
+@login_required(login_url='/login')
 def place_bid(request, listing_id):
     if request.method == "POST":
         value = request.POST["bid"]
@@ -184,7 +187,7 @@ def place_bid(request, listing_id):
 POST view for a listing owner to accept a bid. The listing is then changed to inactive and a winner assigned.
 ... redirects to the index page.
 '''
-@login_required(login_url='/login_view')
+@login_required(login_url='/login')
 def accept_bid(request, listing_id):
     if request.method == "POST":
         listing = Listing.objects.get(id=listing_id)
@@ -200,7 +203,7 @@ def accept_bid(request, listing_id):
 POST view to add or remove a listing to a user's watchlist.
 GET view to view a page showing all the listings on the user's watchlist.
 '''
-@login_required(login_url='/login_view')
+@login_required(login_url='/login')
 def watchlist(request):
     if request.method == "POST":
         listing_id = request.POST['listing_id']
@@ -222,7 +225,7 @@ def watchlist(request):
 '''
 GET view that shows a page with all the listings that a user has made bids on.
 '''
-@login_required(login_url='/login_view')
+@login_required(login_url='/login')
 def your_bids(request):
     if Bid.objects.filter(user__id=request.user.id).exists():
         listings = Listing.objects.filter(bids__user = request.user.id).all().distinct()
@@ -236,7 +239,7 @@ def your_bids(request):
 '''
 POST view to add a comment to a listing. Once the listing is made, the page is reloaded and the new comment displayed.
 '''
-@login_required(login_url='/login_view')
+@login_required(login_url='/login')
 def comment(request, listing_id):
     if request.method == "POST":
         if request.POST['comment']:
