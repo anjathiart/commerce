@@ -2,9 +2,9 @@
 
 My first Python Django App using Django queries and the Django models API
 
-This application is a mock auction site website similar (and simpler) to bid-or-buy and forms part of CS50 Web 2020. 
+This application is a mock auction site website similar (and simpler) to bid-or-buy and forms part of CS50 Web 2020. It is done without javascript or JS framework and focusses on using Django models and templates.
 
-This project is deliberatly done without javascript. 
+Video demonstrating the application:  https://youtu.be/71YrEOlvQRU
 
 ## Technologies
 
